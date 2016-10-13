@@ -38,10 +38,9 @@ userSchema.pre('save', function(next) {
     });
 });
 
-userSchema.methods.comparePassword = function(attemptedPassword, callback) {
-  bcrypt.compare(attemptedPassword, this.password, function(err, isMatch) {
-    callback(isMatch);
-  });
+userSchema.methods.comparePassword = function(attemptedPassword) {
+  var compare = Promise.promisify(bcrypt.compare);
+  return compare(attemptedPassword, this.password).bind(this);
 };
 
 module.exports = db.model('User', userSchema);
