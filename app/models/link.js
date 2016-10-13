@@ -37,4 +37,4 @@ linkSchema.pre('save', function(next) {
 //   }
 // });
 
-module.exports = db.mongoose.model('Url', linkSchema);
+module.exports = db.model('Url', linkSchema);

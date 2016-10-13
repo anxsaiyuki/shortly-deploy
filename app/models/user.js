@@ -44,7 +44,7 @@ userSchema.methods.comparePassword = function(attemptedPassword, callback) {
   });
 };
 
-module.exports = db.mongoose.model('User', userSchema);
+module.exports = db.model('User', userSchema);
 
 //       user.increments('id').primary();
 //       user.string('username', 100).unique();
