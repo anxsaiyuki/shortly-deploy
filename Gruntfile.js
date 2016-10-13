@@ -2,7 +2,23 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+    concurrent: {
+      dev: [
+        'nodemon',
+        'watch'
+      ],
+      options: {
+        logConcurrentOutput: true
+      }
+    },
     concat: {
+      options: {
+        separator: ';',
+      },
+      dist: {
+        src: ['public/client/**/*.js'],
+        dest: 'public/dist/built.js',
+      },
     },
 
     mochaTest: {
@@ -21,15 +37,29 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      my_target: {
+        files: {
+          'public/dist/built.min.js': ['public/dist/built.js']
+        }
+      }
     },
 
     eslint: {
       target: [
-        // Add list of files to lint here
+        'public/client/**/*.js'
       ]
     },
 
     cssmin: {
+      target: {
+        files: [{
+          expand: true,
+          cwd: 'public',
+          src: ['*.css', '!*.min.css'],
+          dest: 'public/dist',
+          ext: '.min.css'
+        }]
+      }
     },
 
     watch: {
@@ -63,9 +93,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-nodemon');
+  grunt.loadNpmTasks('grunt-concurrent');
 
   grunt.registerTask('server-dev', function (target) {
-    grunt.task.run([ 'nodemon', 'watch' ]);
+    grunt.task.run(['concurrent']);
   });
 
   ////////////////////////////////////////////////////
@@ -77,11 +108,17 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
+    'eslint',
+    'concat',
+    'uglify',
+    'cssmin',
+    'mochaTest'
   ]);
 
   grunt.registerTask('upload', function(n) {
     if (grunt.option('prod')) {
       // add your production server task here
+      grunt.task.run([ 'deploy' ]);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
@@ -89,7 +126,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('deploy', [
     // add your deploy tasks here
-  ]);
 
+    //push droplet
+  ]);
 
 };
